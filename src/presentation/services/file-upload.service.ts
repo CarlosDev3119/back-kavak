@@ -2,17 +2,18 @@ import { UploadedFile } from "express-fileupload";
 import fs, { existsSync } from 'fs';
 import { Uuid } from "../../config/uuid.adapter";
 import { GoogleDriveService } from "./google-drive.service";
+import path from "path";
 
 export class FileUploadService {
 
     constructor(
         private readonly uuid = Uuid.v4,
-        private readonly googleDriveService: GoogleDriveService
     ){}
 
     
     async uploadSingle(
         file: UploadedFile,
+        folder: string = 'uploads',
         validExtensions: string[] = ['png', 'jpg', 'jpeg', 'gif', 'pdf'],
     ){
         
@@ -26,13 +27,13 @@ export class FileUploadService {
                 throw new Error(`Invalid file extension: ${fileExtension} valid ones ${validExtensions}` );
             }
 
-            const authClient = await this.googleDriveService.authorize();
-            await this.googleDriveService.uploadFileDrive(authClient, mimeType, name, file)
+            // const authClient = await this.googleDriveService.authorize();
+            // await this.googleDriveService.uploadFileDrive(authClient, mimeType, name, file)
 
             const fileName = `${name}.${ fileExtension }`;
             
-
-            // file.mv(`${destination}/${fileName}`);
+            const destination = path.resolve( __dirname, '../../../', folder );
+            file.mv(`${destination}/${fileName}`);
 
             return { fileName };
 
@@ -43,12 +44,14 @@ export class FileUploadService {
 
     }
     
+    
     async uploadMultiple(
         files: UploadedFile[],
+        folder: string = 'uploads',
         validExtensions: string[] = ['png', 'jpg', 'jpeg', 'gif', 'pdf'] 
     ){
         const fileNames = await Promise.all(
-            files.map( file => this.uploadSingle(file, validExtensions))
+            files.map( file => this.uploadSingle(file, folder, validExtensions))
         )
 
         return fileNames;

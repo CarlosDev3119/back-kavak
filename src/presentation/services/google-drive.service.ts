@@ -31,12 +31,13 @@ export class GoogleDriveService {
           return jwtClient;
     }
 
-    public async uploadFileDrive(authClient: any, mymeType: string, fileName: string, fileContent: UploadedFile){
+    public async uploadFileDrive(authClient: any, mymeType: string, fileName: string, fileContent: any){
         const drive = google.drive({ version: 'v3', auth: authClient });
     
+        const base64Data = fileContent.toString('base64');
         const file = await drive.files.create({
             media: {
-                body: fileContent,
+                body: base64Data,
                 mimeType: mymeType 
             },
             fields: 'id',

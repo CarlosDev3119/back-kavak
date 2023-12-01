@@ -1,9 +1,10 @@
 import { Router } from 'express';
 import { FileUploadController } from './controller';
 import { FileUploadService } from '../services/file-upload.service';
-import { FileUploadMiddleware } from '../middlewares/file-upload.middleware';
+
 import { GoogleDriveService } from '../services/google-drive.service';
 import { Uuid } from '../../config';
+import { FileUploadMiddleware } from '../middlewares/file-upload.middleware';
 
 export class FileUploadRoutes {
 
@@ -11,9 +12,9 @@ export class FileUploadRoutes {
 
         const router = Router();
 
-        const googleService = new GoogleDriveService();
-        const fileUploadService = new FileUploadService(Uuid.v4, googleService);
-        const kavakController = new FileUploadController(fileUploadService);
+        const fileUploadService = new FileUploadService(Uuid.v4 );
+        const googleService = new GoogleDriveService()
+        const kavakController = new FileUploadController(fileUploadService, googleService);
 
         
         router.use( FileUploadMiddleware.containFiles )
@@ -21,7 +22,7 @@ export class FileUploadRoutes {
         
         router.post('/multiple', kavakController.uploadMultipleFiles);
 
-   
+        router.post('/drive', kavakController.readFiles);
 
 
 

@@ -2,12 +2,12 @@
 
 import { Request, Response } from 'express';
 import { FileUploadService } from '../services/file-upload.service';
-import { Observable, of, timer } from 'rxjs';
-import { catchError, switchMap } from 'rxjs/operators';
-import * as fs from 'fs';
+
 import { UploadedFile } from 'express-fileupload';
 import path from 'path';
+import * as fs from 'fs';
 import { GoogleDriveService } from '../services/google-drive.service';
+
 
 const keys = [
     'talon',
@@ -28,6 +28,7 @@ export class FileUploadController {
 
     constructor(
         private readonly fileUploadService: FileUploadService,
+        private readonly googleDriveService: GoogleDriveService,
     ){}
 
 
@@ -40,11 +41,7 @@ export class FileUploadController {
     
             
             const data = await this.fileUploadService.uploadSingle( file )
-            // const authClient = await this.googleDriveService?.authorize();
-            // await this.googleDriveService?.uploadFile(authClient);
-                
-              
-            
+                        
             res.json({
                 message: 'upload file',
                 data
@@ -66,15 +63,8 @@ export class FileUploadController {
           
             const files = req.body.files as UploadedFile[];
 
-            console.log(files)
-            
-            
             const data = await this.fileUploadService.uploadMultiple( files );
-            
-            // const dataFiles = this.fileUploadService.setFiles(keys, data)
-            // const folder = path.resolve( __dirname, '../../../', 'uploads' );
-            
-
+                    
             res.json({
                 message: 'upload files',
                 data: {
@@ -92,38 +82,30 @@ export class FileUploadController {
 
     }
 
-    // private deleteFolderContentsAfterDelay(folderPath: string, delayInSeconds: number) {
-        
-    //     const delayObservable = timer(delayInSeconds * 1000);
-    
-    //     delayObservable.pipe(
-    //         switchMap(() => {
-    //             return new Observable<void>((observer) => {
-    //                 // Eliminar contenido de la carpeta
-    //                 fs.readdir(folderPath, (err, files) => {
-    //                     if (err) {
-    //                         observer.error(err);
-    //                     } else {
-    //                         files.forEach((file) => {
-    //                             const filePath = `${folderPath}/${file}`;
-    //                             fs.unlink(filePath, (err) => {
-    //                                 if (err) {
-    //                                     observer.error(err);
-    //                                 }
-    //                             });
-    //                         });
-    //                         observer.complete();
-    //                     }
-    //                 });
-    //             });
-    //         }),
-    //         catchError((err) => {
-    //             console.error('Error deleting folder contents:', err);
-    //             return of();
-    //         })
-    //     ).subscribe(() => {
-    //         console.log(`Content in '${folderPath}' deleted after ${delayInSeconds} seconds.`);
-    //     });
-    // }
+    public readFiles = async (req: Request, res: Response) => {
+        const destination = path.resolve( __dirname, '../../../', 'uploads' );
+        // console.log(destination);
+        try {
+            const contenidoDocumento = await fs.promises.readdir(destination);
+            const contenidosArchivos = [];
+
+            // Leer el contenido de cada archivo
+            for (const archivo of contenidoDocumento) {
+              const rutaDocumento = path.join(destination, archivo);
+              const contenidoDocumento = await fs.promises.readFile(rutaDocumento);
+              contenidosArchivos.push({ nombre: archivo, contenido: contenidoDocumento });
+            }
+            
+           
+            const data = await this.googleDriveService.uploadFileDrive( await this.googleDriveService.authorize(), 'image/jpg', contenidosArchivos[0].nombre, contenidosArchivos[0].contenido)
+            // console.log(data);
+            // Crear una respuesta JSON con la lista de contenidos de archivos
+            // console.log(contenidosArchivos);
+
+          } catch (error) {
+            console.error(error);
+          }
+    }
+
 
 }
