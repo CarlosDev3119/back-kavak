@@ -1,0 +1,194 @@
+if (context.session.BotUserSession.activoDigital==="UNETE") {
+    
+    var payload = ["uno", "dos", "tres", "cuatro", "cinco"];
+    var message = {
+        "type": "template",
+        "payload": {
+            "text":"{{context.session.BotUserSession.sobrenombre}}, tu opinión es muy importante ❤️. Donde 1 Estrella es “Muy Insatisfecha” y 5 Estrellas es “Muy Satisfecha”¿Qué tan satisfecha te sientes con el servicio recibido?",
+            "template_type": "feedbackTemplate",
+            "view":"star",
+            "sliderView":false, //add this line and change to true when you want template to open as slider
+            "starArrays":[],
+            "smileyArrays":[],
+            "messageTodisplay":"Glad you liked the experience. Thanks!"//To display on click of 5th star or emoji
+        }
+};
+ if(message.payload.view === "star"){
+    var level=5;
+    for (i = level; i >=1; i--) {
+        j= i-1;
+    var starArray = {
+        "starId": i,
+        "value": payload[j],
+    };
+message.payload.starArrays.push(starArray);
+}
+
+}
+else if(message.payload.view === "emojis"){
+    for(var i=0;i<=5;i++){
+        var smileyArray = {
+            "smileyId":i,
+            "value": i
+        };
+        message.payload.smileyArrays.push(smileyArray);
+    }
+}
+print(JSON.stringify(message));
+
+// var quickReplies = ["1⭐","2⭐","3⭐","4⭐","5⭐"];
+
+// var message = {
+//     "type": "template",
+//     "payload": {
+//         "template_type": "quick_replies",
+//         "text": "",
+//         "quick_replies":[]
+//     }
+// };
+
+// //for (i = 0; i < quickReplies.length; i++) {
+//     //if only text needs to diplayed
+//     var quickReply = {
+//         "content_type": "postback",
+//         "title": quickReplies[0],
+//         "payload": "uno"
+//     };
+    
+//      var quickReply2 = {
+//         "content_type": "postback",
+//         "title": quickReplies[1],
+//         "payload": "dos"
+//     };
+    
+//      var quickReply3 = {
+//         "content_type": "postback",
+//         "title": quickReplies[2],
+//         "payload": "tres"
+//     };
+    
+//      var quickReply4 = {
+//         "content_type": "postback",
+//         "title": quickReplies[3],
+//         "payload": "cuatro"
+//     };
+    
+//      var quickReply5 = {
+//         "content_type": "postback",
+//         "title": quickReplies[4],
+//         "payload": "cinco"
+//     };
+    /* Uncomment this if both text and image needs to displayed for the  quick reply button
+     var quickReply = {
+     "content_type":"text",
+     "title":quickReplies[i],
+     "payload":"payload2",
+     "image_url": "url of the image
+     };
+     */
+//     message.payload.quick_replies.push(quickReply);
+//     message.payload.quick_replies.push(quickReply2);
+//     message.payload.quick_replies.push(quickReply3);
+//     message.payload.quick_replies.push(quickReply4);
+//     message.payload.quick_replies.push(quickReply5);
+
+// print(JSON.stringify(message));
+} else {
+    var textoSatisfaccion = "Donde 1 Estrella es “Muy Insatisfecha” y 5 Estrellas es “Muy Satisfecha” ";
+    var nameUser = context.session.BotUserSession.sobrenombre
+    var payload = ["uno", "dos", "tres", "cuatro", "cinco"];
+    var text = `${ nameUser }, tu opinión es muy importante ❤️. ¿Podrías calificar mi atención? ${textoSatisfaccion}`
+    var message = {
+        "type": "template",
+        "payload": {
+        // "text":" * {{context.session.BotUserSession.sobrenombre}} * , tu opinión es muy importante ❤️. "+ textoSatisfaccion + " ¿Podrías calificar mi atención?",
+        "text": text,
+        "template_type": "feedbackTemplate",
+        "view":"star",
+        "sliderView":false, //add this line and change to true when you want template to open as slider
+        "starArrays":[],
+        "smileyArrays":[],
+        "messageTodisplay":"Glad you liked the experience. Thanks!"//To display on click of 5th star or emoji
+    }
+};
+ if(message.payload.view === "star"){
+    var level=5;
+    for (i = level; i >=1; i--) {
+        j= i-1;
+    var starArray = {
+        "starId": i,
+        "value": payload[j],
+    };
+message.payload.starArrays.push(starArray);
+}
+
+}
+else if(message.payload.view === "emojis"){
+    for(var i=0;i<=5;i++){
+     var smileyArray = {
+        "smileyId":i,
+        "value": i
+    };
+message.payload.smileyArrays.push(smileyArray);
+    }
+}
+print(JSON.stringify(message));
+
+// var quickReplies = ["1⭐","2⭐","3⭐","4⭐","5⭐"];
+
+// var message = {
+//     "type": "template",
+//     "payload": {
+//         "template_type": "quick_replies",
+//         "text": "",
+//         "quick_replies":[]
+//     }
+// };
+
+// //for (i = 0; i < quickReplies.length; i++) {
+//     //if only text needs to diplayed
+//     var quickReply = {
+//         "content_type": "postback",
+//         "title": quickReplies[0],
+//         "payload": "uno"
+//     };
+    
+//      var quickReply2 = {
+//         "content_type": "postback",
+//         "title": quickReplies[1],
+//         "payload": "dos"
+//     };
+    
+//      var quickReply3 = {
+//         "content_type": "postback",
+//         "title": quickReplies[2],
+//         "payload": "tres"
+//     };
+    
+//      var quickReply4 = {
+//         "content_type": "postback",
+//         "title": quickReplies[3],
+//         "payload": "cuatro"
+//     };
+    
+//      var quickReply5 = {
+//         "content_type": "postback",
+//         "title": quickReplies[4],
+//         "payload": "cinco"
+//     };
+    /* Uncomment this if both text and image needs to displayed for the  quick reply button
+     var quickReply = {
+     "content_type":"text",
+     "title":quickReplies[i],
+     "payload":"payload2",
+     "image_url": "url of the image
+     };
+     */
+//     message.payload.quick_replies.push(quickReply);
+//     message.payload.quick_replies.push(quickReply2);
+//     message.payload.quick_replies.push(quickReply3);
+//     message.payload.quick_replies.push(quickReply4);
+//     message.payload.quick_replies.push(quickReply5);
+
+// print(JSON.stringify(message));
+}

@@ -1,41 +1,38 @@
 import { UploadedFile } from "express-fileupload";
-import path from "path";
 import fs, { existsSync } from 'fs';
 import { Uuid } from "../../config/uuid.adapter";
+import { GoogleDriveService } from "./google-drive.service";
 
 export class FileUploadService {
+
     constructor(
-        private readonly uuid = Uuid.v4
+        private readonly uuid = Uuid.v4,
+        private readonly googleDriveService: GoogleDriveService
     ){}
 
-    private checkFolder( folderPath: string ){
-        if( !existsSync(folderPath) ){
-            fs.mkdirSync(folderPath);
-        }
-    }  
     
     async uploadSingle(
         file: UploadedFile,
-        folder: string = 'uploads',
         validExtensions: string[] = ['png', 'jpg', 'jpeg', 'gif', 'pdf'],
     ){
         
         try{
             
             const fileExtension = file.mimetype.split('/').at(1) ?? '';
+            const mimeType = file.mimetype;
             const name = file.name.split('.').at(0) ?? '';
 
             if( !validExtensions.includes(fileExtension)){
                 throw new Error(`Invalid file extension: ${fileExtension} valid ones ${validExtensions}` );
             }
 
-            const destination = path.resolve( __dirname, '../../../', folder );
-            this.checkFolder(destination);
+            const authClient = await this.googleDriveService.authorize();
+            await this.googleDriveService.uploadFileDrive(authClient, mimeType, name, file)
 
             const fileName = `${name}.${ fileExtension }`;
             
 
-            file.mv(`${destination}/${fileName}`);
+            // file.mv(`${destination}/${fileName}`);
 
             return { fileName };
 
@@ -48,39 +45,16 @@ export class FileUploadService {
     
     async uploadMultiple(
         files: UploadedFile[],
-        folder: string = 'uploads',
         validExtensions: string[] = ['png', 'jpg', 'jpeg', 'gif', 'pdf'] 
     ){
         const fileNames = await Promise.all(
-            files.map( file => this.uploadSingle(file, folder, validExtensions))
+            files.map( file => this.uploadSingle(file, validExtensions))
         )
 
         return fileNames;
     }
 
 
-    setFiles(
-        keys: string[],
-        files: {
-            fileName: string;
-        }[],
-    ) {
 
-        const data: Record<string, string> = {};
-        files.forEach(archivo => {
-            const fileName = archivo.fileName.toLowerCase();
-        
-            keys.forEach(key => {
-                if (fileName.includes(key)) {
-                    data[key] = archivo.fileName;
-                }
-            });
-        });
-
-        const archivosFaltantes = keys.filter(key => !data[key]);
-        return archivosFaltantes;
-
-    }
-        
     
 }
