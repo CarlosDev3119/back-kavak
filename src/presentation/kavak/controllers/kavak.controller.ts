@@ -5,6 +5,7 @@ import { prisma } from '../../../data/mysql';
 import { Kavakpoc } from '../interfaces/interfaces';
 
 
+
 export class KavakController {
 
 
@@ -17,9 +18,16 @@ export class KavakController {
 
             const dataKavak = await prisma.kavakpoc.findUnique({
                 where: {
-                    idkavakpoc: +id
+                    idkavakpoc: id
                 }
             }) as Kavakpoc;
+            
+            if(!dataKavak){
+                return res.json({
+                    message: 'Pending',
+                    data: []
+                })
+            }
 
             const {idkavakpoc, ...rest} = dataKavak;
 
@@ -33,5 +41,9 @@ export class KavakController {
         }
 
     }
+
+    private wait(ms: number): Promise<void> {
+        return new Promise(resolve => setTimeout(resolve, ms));
+      }
 
 }

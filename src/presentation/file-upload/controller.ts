@@ -6,7 +6,6 @@ import { FileUploadService } from '../services/file-upload.service';
 import { UploadedFile } from 'express-fileupload';
 import path from 'path';
 import * as fs from 'fs';
-import { GoogleDriveService } from '../services/google-drive.service';
 
 
 const keys = [
@@ -28,7 +27,6 @@ export class FileUploadController {
 
     constructor(
         private readonly fileUploadService: FileUploadService,
-        private readonly googleDriveService: GoogleDriveService,
     ){}
 
 
@@ -72,8 +70,6 @@ export class FileUploadController {
                 }
                 
             })
-
-    
                     
         }catch (error: any) {
             res.status(400).json({ error: error.message });
@@ -81,31 +77,5 @@ export class FileUploadController {
 
 
     }
-
-    public readFiles = async (req: Request, res: Response) => {
-        const destination = path.resolve( __dirname, '../../../', 'uploads' );
-        // console.log(destination);
-        try {
-            const contenidoDocumento = await fs.promises.readdir(destination);
-            const contenidosArchivos = [];
-
-            // Leer el contenido de cada archivo
-            for (const archivo of contenidoDocumento) {
-              const rutaDocumento = path.join(destination, archivo);
-              const contenidoDocumento = await fs.promises.readFile(rutaDocumento);
-              contenidosArchivos.push({ nombre: archivo, contenido: contenidoDocumento });
-            }
-            
-           
-            const data = await this.googleDriveService.uploadFileDrive( await this.googleDriveService.authorize(), 'image/jpg', contenidosArchivos[0].nombre, contenidosArchivos[0].contenido)
-            // console.log(data);
-            // Crear una respuesta JSON con la lista de contenidos de archivos
-            // console.log(contenidosArchivos);
-
-          } catch (error) {
-            console.error(error);
-          }
-    }
-
 
 }
